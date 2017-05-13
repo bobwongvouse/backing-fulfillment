@@ -7,12 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
 )
 
-var(
+var (
 	formatter = render.New(render.Options{
 		IndentJSON: true,
 	})
@@ -20,8 +18,9 @@ var(
 
 func TestGetFulfillmentStatusReturns200ForExistingSKU(t *testing.T) {
 	var (
-		request *http.Request
-		recorder *httptest.ResponseRecorder)
+		request  *http.Request
+		recorder *httptest.ResponseRecorder
+	)
 	server := NewServer()
 
 	targetSKU := "THINGAMAJIG12"
@@ -34,27 +33,27 @@ func TestGetFulfillmentStatusReturns200ForExistingSKU(t *testing.T) {
 	var detail fulfillmentStatus
 
 	//expect OK http response from server to be transmitted
-	if(recorder.Code != http.StatusOK) {
+	if recorder.Code != http.StatusOK {
 		t.Errorf("Expected %v; received %v", http.StatusOK, recorder.Code)
 	}
 
 	//Parse response body
 	payload, err := ioutil.ReadAll(recorder.Body)
-	if(err != nil) {
+	if err != nil {
 		t.Errorf("Error parsing response body: %v", err)
 	}
 	err = json.Unmarshal(payload, &detail)
-	if(err != nil) {
-		t.Errorf("Error unmarshaling response to fullfillment status: %v", err)
+	if err != nil {
+		t.Errorf("Error unmarshaling response to fulfillment status: %v", err)
 	}
 
-	if(detail.QuantityInStock != 100) {
+	if detail.QuantityInStock != 100 {
 		t.Errorf("Expected 100 qty in stock, got %d", detail.QuantityInStock)
 	}
-	if(detail.ShipsWithin != 14) {
-		t.ErrorF("Expected ships within 14 days, got %d", detail.ShipsWithin)
+	if detail.ShipsWithin != 14 {
+		t.Errorf("Expected ships within 14 days, got %d", detail.ShipsWithin)
 	}
-	if(detail.SKU != "THINGAMAJIG12") {
+	if detail.SKU != "THINGAMAJIG12" {
 		t.Errorf("Expected SKU THINGAMAJIG12, got %s", detail.SKU)
 	}
 }
